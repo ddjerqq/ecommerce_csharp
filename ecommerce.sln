@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ecommerce", "ecommerce\ecommerce.csproj", "{8BDDCD4A-ACC2-4E29-A7CE-82DF350ABCD1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ecommerce.Core", "ecommerce.Core\ecommerce.Core.csproj", "{95204B1E-194E-4251-8F3E-2BD18727BADB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8BDDCD4A-ACC2-4E29-A7CE-82DF350ABCD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BDDCD4A-ACC2-4E29-A7CE-82DF350ABCD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BDDCD4A-ACC2-4E29-A7CE-82DF350ABCD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BDDCD4A-ACC2-4E29-A7CE-82DF350ABCD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95204B1E-194E-4251-8F3E-2BD18727BADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95204B1E-194E-4251-8F3E-2BD18727BADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95204B1E-194E-4251-8F3E-2BD18727BADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95204B1E-194E-4251-8F3E-2BD18727BADB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
