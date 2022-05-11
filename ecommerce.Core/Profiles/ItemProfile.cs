@@ -7,15 +7,7 @@ namespace ecommerce.Core.Profiles
     {
         public ItemProfile()
         {
-            CreateMap<Item, ItemDto>()
-                .ForMember(dest => dest.Type,
-                    opt =>
-                        opt.MapFrom(src => src.Type))
-                .ForMember(dest => dest.OwnerId,
-                    opt =>
-                        opt.MapFrom(src => src.OwnerId));
-
-            CreateMap<ItemDto, Item>()
+            CreateMap<ItemCreateDto, Item>()
                 .ForMember(dest => dest.OwnerId,
                     opt =>
                         opt.MapFrom(src => src.OwnerId))

@@ -8,16 +8,10 @@ namespace ecommerce.Core.Profiles
     {
         public UserProfile()
         {
-            CreateMap<User, UserDto>()
-                .ForMember(dest => 
-                        dest.Items, 
-                    opt => 
-                        opt.MapFrom(src => src.Items));
-
-            CreateMap<UserDto, User>().ForMember(dest => 
-                    dest.Items,
+            CreateMap<UserCreateDto, User>()
+                .ForMember(dest => dest.Username,
                 opt => 
-                    opt.MapFrom(src => src.Items));
+                    opt.MapFrom(src => src.Username));
         }
     }
 }

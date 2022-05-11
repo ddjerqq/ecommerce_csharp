@@ -7,13 +7,16 @@ namespace ecommerce.Core.Factories
     {
         public static User Create(string username)
         {
-            var user = new User();
-            user.Id = GioId.New();
-            user.Username = username;
-            user.Experience = 0;
-            user.Wallet = 0;
-            user.Bank = 0;
-            user.Items = new List<Item>();
+            var user = new User()
+            {
+                Id = GioId.New(),
+                Username = username,
+                Experience = 0,
+                Wallet = 0,
+                Bank = 0,
+                Items = new List<Item>(),    
+            };
+
             return user;
         }
     }

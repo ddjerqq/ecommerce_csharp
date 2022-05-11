@@ -39,7 +39,13 @@ namespace ecommerce.Core.Services
 
         public async Task<User> GetByIdAsync(long id)
         {
-            User user = await _userRepository.GetByIdAsync(id);
+            var user = await _userRepository.GetByIdAsync(id);
+
+            if (user == null)
+            {
+                return null;
+            }
+
             var items = await _itemRepository.GetAllAsync();
             
             if (items.Count() != 0)
@@ -51,25 +57,22 @@ namespace ecommerce.Core.Services
                 
                 user.Items = userItems.ToList();
             }
+            else
+            {
+                user.Items = new List<Item>();
+            }
+            
             return user;
         }
 
         public async Task AddAsync(User entity)
         {
             await _userRepository.AddAsync(entity);
-            
-            foreach (Item item in entity.Items)
-            {
-                await _itemRepository.AddAsync(item);
-            }
-
-            await _itemRepository.SaveChangesAsync();
-            await _userRepository.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(User entity)
         {
-            _userRepository.Update(entity);
+            await _userRepository.Update(entity);
             
             var dbItems = await _itemRepository.GetAllAsync();
 
@@ -84,28 +87,22 @@ namespace ecommerce.Core.Services
                 } 
                 else if (!entity.Items.Contains(item) && dbItems.Contains(item))
                 {
-                    _itemRepository.Delete(item);
+                    await _itemRepository.Delete(item);
                 }
                 else
                 {
-                    _itemRepository.Update(item);
+                    await _itemRepository.Update(item);
                 }
             }
-            
-            await _itemRepository.SaveChangesAsync();
-            await _userRepository.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(User entity)
         {
-            _userRepository.Delete(entity);
+            await _userRepository.Delete(entity);
             foreach (Item item in entity.Items)
             {
-                _itemRepository.Delete(item);
+                await _itemRepository.Delete(item);
             }
-
-            await _itemRepository.SaveChangesAsync();
-            await _userRepository.SaveChangesAsync();
         }
     }
 }

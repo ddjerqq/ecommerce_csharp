@@ -15,12 +15,12 @@ namespace ecommerce.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        // private readonly IMapper _mapper;
+        private readonly IMapper _mapper;
 
-        public UserController(IUserService userService) // IMapper mapper
+        public UserController(IUserService userService, IMapper mapper)
         {
+            _mapper = mapper;
             _userService = userService;
-            // _mapper = mapper;
         }
 
         [HttpGet("get/")]
@@ -33,7 +33,6 @@ namespace ecommerce.Controllers
                 return NoContent();
             }
 
-            // var userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
             return Ok(users);
         }
         
@@ -47,16 +46,15 @@ namespace ecommerce.Controllers
                 return NotFound();
             }
 
-            // var userDto = _mapper.Map<UserDto>(user);
             return Ok(user);
         }
         
-        [HttpPost("create/{username}")]
-        public async Task<IActionResult> CreateUser(string username)
+        [HttpPost("create/")]
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateDto userCreateDto)
         {
-            User user = UserFactory.Create(username);
+            var user = UserFactory.Create(userCreateDto.Username);
             await _userService.AddAsync(user);
-            return Ok(user);
+            return Ok();
         }
 
         [HttpPut("update/")]
@@ -75,21 +73,21 @@ namespace ecommerce.Controllers
             return Ok();
         }
 
-        [HttpPost("createItem/{type}&{ownerId}")]
-        public async Task<IActionResult> CreateItem(ItemType type, long ownerId)
+        [HttpPost("createItem/")]
+        public async Task<IActionResult> CreateItem([FromBody] ItemCreateDto itemCreateDto)
         {
-            var user = await _userService.GetByIdAsync(ownerId);
+            var user = await _userService.GetByIdAsync(itemCreateDto.OwnerId);
 
             if (user is null)
             {
                 return NotFound();
             }
-            var item = ItemFactory.Create(type, ownerId);
+            var item = ItemFactory.Create(itemCreateDto.Type, itemCreateDto.OwnerId);
             user.Items.ToList().Add(item);
 
             await _userService.UpdateAsync(user);
             
-            return Ok(item);
+            return Ok();
         }
     }
 }
