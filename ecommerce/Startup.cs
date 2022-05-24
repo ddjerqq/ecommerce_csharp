@@ -1,5 +1,9 @@
 using ecommerce.Core.Contexts;
-using ecommerce.Core.Profiles;
+using ecommerce.Core.Database;
+using ecommerce.Core.Factories;
+using ecommerce.Core.Factories.Interfaces;
+using ecommerce.Core.MappingProfiles;
+using ecommerce.Core.Models;
 using ecommerce.Core.Repositories;
 using ecommerce.Core.Repositories.Interfaces;
 using ecommerce.Core.Services;
@@ -25,6 +29,8 @@ namespace ecommerce
         }
 
         public IConfiguration Configuration { get; }
+        private string _connectionString { get => Configuration["DatabaseName"]; }
+        private DbConfig _dbConfig { get => new DbConfig(_connectionString); }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -33,30 +39,39 @@ namespace ecommerce
             services.AddMvc(o => 
                     o.Filters.Add(typeof(ModelStateValidator)))
                 .AddFluentValidation(x => 
-                    x.RegisterValidatorsFromAssemblyContaining<UserValidator>());
+                    x.RegisterValidatorsFromAssemblyContaining<CustomerValidator>());
             
-            services.AddControllers();
+            services.AddSwaggerGenNewtonsoftSupport();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "ecommerce", Version = "v1"});
             });
             
             services.AddRouting(o => o.LowercaseUrls = true);
+            
+            services.AddDbContext<ApplicationDbContext>(o => 
+                o.UseSqlite(_connectionString));
+            
+            services.AddSingleton(_dbConfig);
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                {
-                    options.UseSqlite(
-                        "Data Source=C:\\work\\!actual_work\\ecommerce_api\\ecommerce\\ecommerce.Core\\database.sqlite"
-                    );
-                }); 
+            services.AddSingleton<IProductFactory,  ProductFactory>();
+            services.AddSingleton<ICustomerFactory, CustomerFactory>();
+            services.AddSingleton<IOrderFactory,    OrderFactory>();
             
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IItemRepository, ItemRepository>();
+            services.AddScoped<IProductRepository,  ProductRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IOrderRepository,    OrderRepository>();
+
+            services.AddScoped<IProductService,     ProductService>();
+            services.AddScoped<ICustomerService,    CustomerService>();
+            services.AddScoped<IOrderService,       OrderService>();
             
-            services.AddScoped<IUserService,    UserService>();
+            
+            services.AddScoped<IAnalyticsService,   AnalyticsService>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, 
+                              IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
