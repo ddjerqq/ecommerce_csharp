@@ -1,8 +1,9 @@
-using System;
-using System.Text.Json.Serialization;
 using ecommerce.Core.Contexts;
 using ecommerce.Core.Database;
-using ecommerce.Core.Profiles;
+using ecommerce.Core.Factories;
+using ecommerce.Core.Factories.Interfaces;
+using ecommerce.Core.MappingProfiles;
+using ecommerce.Core.Models;
 using ecommerce.Core.Repositories;
 using ecommerce.Core.Repositories.Interfaces;
 using ecommerce.Core.Services;
@@ -12,7 +13,6 @@ using ecommerce.Filters;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +29,8 @@ namespace ecommerce
         }
 
         public IConfiguration Configuration { get; }
+        private string _connectionString { get => Configuration["DatabaseName"]; }
+        private DbConfig _dbConfig { get => new DbConfig(_connectionString); }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -37,13 +39,8 @@ namespace ecommerce
             services.AddMvc(o => 
                     o.Filters.Add(typeof(ModelStateValidator)))
                 .AddFluentValidation(x => 
-                    x.RegisterValidatorsFromAssemblyContaining<UserValidator>());
+                    x.RegisterValidatorsFromAssemblyContaining<CustomerValidator>());
             
-            services.AddControllers()
-                .AddJsonOptions(o => {
-                    o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                });
-
             services.AddSwaggerGenNewtonsoftSupport();
             services.AddSwaggerGen(c =>
             {
@@ -51,21 +48,25 @@ namespace ecommerce
             });
             
             services.AddRouting(o => o.LowercaseUrls = true);
-
-            // services.AddDbContext<ApplicationDbContext>(options =>
-            //     {
-            //         options.UseSqlite(
-            //             "Data Source=C:\\work\\!actual_work\\ecommerce_api\\ecommerce\\ecommerce.Core\\database.sqlite"
-            //         );
-            //     });
-
-            string conStr = Configuration["DatabaseName"];
-            DbConfig dbConfig = new DbConfig {ConnectionString = conStr};;
-            services.AddSingleton(dbConfig);
             
-            services.AddSingleton<IUserRepository, UserRepository>();
-            services.AddSingleton<IItemRepository, ItemRepository>();
-            services.AddSingleton<IUserService,    UserService>();
+            services.AddDbContext<ApplicationDbContext>(o => 
+                o.UseSqlite(_connectionString));
+            
+            services.AddSingleton(_dbConfig);
+
+            services.AddSingleton<IProductFactory,  ProductFactory>();
+            services.AddSingleton<ICustomerFactory, CustomerFactory>();
+            services.AddSingleton<IOrderFactory,    OrderFactory>();
+            
+            services.AddScoped<IProductRepository,  ProductRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IOrderRepository,    OrderRepository>();
+
+            services.AddScoped<IProductService,     ProductService>();
+            services.AddScoped<ICustomerService,    CustomerService>();
+            services.AddScoped<IOrderService,       OrderService>();
+            
+            services.AddScoped<IAnalyticsService,   AnalyticsService>();
         }
 
         public void Configure(IApplicationBuilder app, 

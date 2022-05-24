@@ -2,6 +2,12 @@
 {
     public class DbConfig
     {
-        public string ConnectionString { get; set; }
+        private readonly string _connectionString;
+
+        public DbConfig(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+        public string ConnectionString { get => _connectionString; }
     }
 }
